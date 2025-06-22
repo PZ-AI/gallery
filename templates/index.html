@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Suggester</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>What's in your fridge?</h1>
+    </header>
+    <main>
+        <form method="POST">
+            <label for="ingredients">Enter your ingredients (comma-separated):</label><br>
+            <textarea id="ingredients" name="ingredients" rows="4" cols="50" placeholder="e.g., eggs, tomatoes, rice">{{ request.form.get('ingredients', '') }}</textarea><br><br>
+            <input type="submit" value="Find Recipes">
+        </form>
+
+        {% if suggested_recipes %}
+            <section id="recipe-suggestions">
+                <h2>Recipe Suggestions</h2>
+                <ul>
+                    {% for recipe in suggested_recipes %}
+                        <li>
+                            <h3>{{ recipe.name }}</h3>
+                            <p><strong>Cuisine:</strong> {{ recipe.cuisine }}</p>
+                            <p><strong>Matches:</strong> {{ recipe.match_count }} of your ingredients.</p>
+                            {% if recipe.missing_ingredients %}
+                                <p><strong>Missing:</strong> {{ recipe.missing_ingredients|join(', ') }}</p>
+                            {% endif %}
+                            <a href="{{ url_for('view_recipe', recipe_id=recipe.id) }}">View Recipe</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% elif request.method == 'POST' %}
+            <section id="recipe-suggestions">
+                <h2>Recipe Suggestions</h2>
+                <p>No recipes found matching your ingredients. Try adding more ingredients or check for typos.</p>
+            </section>
+        {% endif %}
+    </main>
+    <footer>
+        <p>&copy; 2023 Recipe Suggester</p>
+    </footer>
+</body>
+</html>

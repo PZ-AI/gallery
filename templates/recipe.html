@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ recipe.name }} - Recipe Suggester</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>{{ recipe.name }}</h1>
+    </header>
+    <main>
+        <a href="{{ url_for('index') }}">&laquo; Back to Search</a>
+
+        <article class="recipe-details">
+            <h2>{{ recipe.name }}</h2>
+            <p><strong>Cuisine:</strong> {{ recipe.cuisine }}</p>
+            <p><strong>Cooking Time:</strong> {{ recipe.cooking_time }}</p>
+            <p><strong>Difficulty:</strong> {{ recipe.difficulty }}</p>
+
+            {% if recipe.dietary_info %}
+            <p><strong>Dietary Information:</strong> {{ recipe.dietary_info|join(', ') }}</p>
+            {% endif %}
+
+            <h3>Ingredients:</h3>
+            <ul>
+                {% for ingredient in recipe.ingredients %}
+                <li>{{ ingredient|capitalize }}</li>
+                {% endfor %}
+            </ul>
+
+            <h3>Instructions:</h3>
+            <ol>
+                {% for step in recipe.instructions %}
+                <li>{{ step }}</li>
+                {% endfor %}
+            </ol>
+
+            <!-- Placeholder for favorite button -->
+            <button id="favoriteButton" data-recipe-id="{{ recipe.id }}">Save to Favorites</button>
+
+            <!-- Placeholder for substitution suggestions -->
+            <section id="substitution-suggestions">
+                <h4>Ingredient Substitutions (Coming Soon)</h4>
+                <p>If you're missing an ingredient, we'll suggest alternatives here.</p>
+            </section>
+
+        </article>
+    </main>
+    <footer>
+        <p>&copy; 2023 Recipe Suggester</p>
+    </footer>
+
+    <script>
+        // Basic script for favorite button (localStorage)
+        const favoriteButton = document.getElementById('favoriteButton');
+        const recipeId = favoriteButton.dataset.recipeId;
+
+        function updateButtonState() {
+            let favorites = JSON.parse(localStorage.getItem('favoriteRecipes')) || [];
+            if (favorites.includes(recipeId)) {
+                favoriteButton.textContent = 'Saved!';
+                favoriteButton.disabled = true;
+            } else {
+                favoriteButton.textContent = 'Save to Favorites';
+                favoriteButton.disabled = false;
+            }
+        }
+
+        favoriteButton.addEventListener('click', function() {
+            let favorites = JSON.parse(localStorage.getItem('favoriteRecipes')) || [];
+            if (!favorites.includes(recipeId)) {
+                favorites.push(recipeId);
+                localStorage.setItem('favoriteRecipes', JSON.stringify(favorites));
+                // alert('Recipe saved to favorites!'); // Optional alert
+            }
+            updateButtonState(); // Update button immediately
+        });
+
+        // Check if recipe is already favorited on page load
+        window.addEventListener('DOMContentLoaded', (event) => {
+            updateButtonState();
+        });
+    </script>
+</body>
+</html>
